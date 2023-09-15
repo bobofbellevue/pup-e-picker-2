@@ -1,11 +1,41 @@
-// Right now these dogs are constant, but in reality we should be getting these from our server
-// Todo: Refactor to get rid of props (THERE SHOULD BE NO PROPS DRILLING ON THIS COMPONENT)
-export const Dogs = () =>
-  // no props allowed
-  {
-    return (
-      //  the "<> </>"" are called react fragments, it's like adding all the html inside
-      // without adding an actual html element
-      <>{/* Make all the dog cards show up here */}</>
-    );
+import { Dog, TabValues } from "../types";
+import { useDogsContext } from "../Providers/DogProvider";
+import { useStatusContext } from "../Providers/StatusProvider";
+import { DogCard } from "./DogCard";
+
+export const Dogs = () => {
+  const { activeTab, isLoading } = useStatusContext();
+  const { dogs, flipDogFavoriteStatus, deleteDog } = useDogsContext();
+
+  const shouldHideContainer =
+    activeTab === TabValues.CREATE_DOG ? { display: "none" } : {};
+
+  const shouldDisplayDog = (dog: Dog) => {
+    switch (activeTab) {
+      case TabValues.FAVORITE:
+        return dog.isFavorite;
+      case TabValues.UNFAVORITE:
+        return !dog.isFavorite;
+      case TabValues.NONE:
+        return true;
+    }
+    return false;
   };
+
+  const displayDogs = dogs.filter((dog) => shouldDisplayDog(dog));
+  
+  return (
+    <div className="content-container" style={shouldHideContainer}>
+      {displayDogs.map((dog) => (
+        <DogCard
+          dog={dog}
+          key={dog.id}
+          onTrashIconClick={() => deleteDog(dog)}
+          onHeartClick={() => flipDogFavoriteStatus(dog)}
+          onEmptyHeartClick={() => flipDogFavoriteStatus(dog)}
+          isLoading={isLoading}
+        />
+      ))}
+    </div>
+  );
+};

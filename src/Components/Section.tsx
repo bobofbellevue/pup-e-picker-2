@@ -1,48 +1,37 @@
 import { ReactNode } from "react";
+import { TabValues } from "../types";
+import { SectionButton } from "./SectionButton";
+import { useDogsContext } from "../Providers/DogProvider";
 
-export const Section = ({
-  label,
-  children,
-}: {
-  // No more props than these two allowed
+export type SectionProps = {
   label: string;
   children: ReactNode;
-}) => {
+}
+
+export const Section = (props: SectionProps) => {
+  const { favoriteCount, unFavoriteCount } = useDogsContext();
+
   return (
     <section id="main-section">
       <div className="container-header">
-        <div className="container-label">{label}</div>
-        <div className="selectors">
-          {/* This should display the favorited count */}
-          <div
-            className={`selector ${"active"}`}
-            onClick={() => {
-              alert("click favorited");
-            }}
-          >
-            favorited ( {0} )
-          </div>
-
-          {/* This should display the unfavorited count */}
-          <div
-            className={`selector ${""}`}
-            onClick={() => {
-              alert("click unfavorited");
-            }}
-          >
-            unfavorited ( {10} )
-          </div>
-          <div
-            className={`selector ${""}`}
-            onClick={() => {
-              alert("clicked create dog");
-            }}
-          >
-            create dog
-          </div>
-        </div>
+        <div className="container-label">{props.label}</div>
+        <SectionButton
+          tab={TabValues.FAVORITE}
+          count={favoriteCount}
+          name="favorited"
+        />
+        <SectionButton
+          tab={TabValues.UNFAVORITE}
+          count={unFavoriteCount}
+          name="unfavorited"
+        />
+        <SectionButton
+          tab={TabValues.CREATE_DOG}
+          count={-1}
+          name="create dog"
+        />
       </div>
-      <div className="content-container">{children}</div>
+      <div className="content-container">{props.children}</div>
     </section>
   );
 };
